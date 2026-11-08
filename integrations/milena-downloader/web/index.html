@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="csrf-token" content="__MILENA_TOKEN__">
+  <meta name="color-scheme" content="light">
+  <title>Milena · Baixar vídeos</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='20' fill='%232e3831'/%3E%3Cpath d='M21 22v20m0-20 11 14 11-14v20' stroke='%23e9f4b6' stroke-width='5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Milena, início"><span class="monogram">m<span>·</span></span><span>milena<span class="brand-divider">/</span><strong>baixar</strong></span></a>
+      <div class="local-badge"><span class="dot"></span><span id="connection-label">Conectando ao notebook</span></div>
+    </header>
+    <main>
+      <section class="hero" aria-labelledby="headline">
+        <div class="eyebrow"><span class="tiny-line"></span> MENOS ETAPAS. MAIS CRIAÇÃO.</div>
+        <h1 id="headline">Seu próximo vídeo,<br><em>na sua pasta.</em></h1>
+        <p class="intro">Cole um link do YouTube ou TikTok.<br>Baixe no notebook e continue criando no Milena Studio.</p>
+        <div class="hero-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="video-tile"><div class="tile-bar"><i></i><i></i><i></i></div><div class="play-shape"></div><span>READY TO CREATE</span></div><div class="arrow-tile"><svg viewBox="0 0 40 40"><path d="M20 7v25M9 22l11 11 11-11"/></svg></div><span class="art-spark">✳</span></div>
+      </section>
+      <section class="download-card" aria-labelledby="download-heading">
+        <div class="card-top"><div><span class="section-number">01 / COMEÇAR</span><h2 id="download-heading">Traga o link.</h2></div><div class="platforms"><span class="youtube-mark" aria-label="YouTube">▶</span><span class="tiktok-mark" aria-label="TikTok">♪</span></div></div>
+        <form id="download-form" novalidate>
+          <label for="video-url">Link do vídeo</label>
+          <div class="input-wrap"><svg class="link-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m10 13 4-4m-6 6-1 1a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0m2 2 1-1a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0"/></svg><input id="video-url" name="url" type="url" placeholder="https://www.youtube.com/watch?v=…" autocomplete="off" spellcheck="false" aria-describedby="url-help form-message"><button id="paste" type="button">Colar</button></div>
+          <p class="field-help" id="url-help">Um vídeo por link. Shorts e links compartilhados do TikTok também.</p>
+          <div class="form-bottom"><div class="quality-field"><label for="quality">Qualidade máxima</label><select id="quality" name="quality"><option value="1080">1080p · Full HD</option><option value="720">720p · Arquivo menor</option><option value="original">Original · Melhor disponível</option></select></div><button id="download-button" type="submit"><span>Baixar vídeo</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></svg></button></div>
+          <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
+        </form>
+        <div class="save-strip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v9H3z"/></svg><div><span>SALVO DIRETO NO NOTEBOOK</span><code id="destination">Videos / MilenaStudio / downloads</code></div><span class="file-pill">MP4</span></div>
+      </section>
+      <section class="queue-section" aria-labelledby="queue-heading"><div class="queue-heading"><div><span class="section-number">02 / ACOMPANHAR</span><h2 id="queue-heading">Seus downloads <span id="queue-count">0</span></h2></div><span class="session-note">Nesta sessão</span></div><div id="downloads" aria-live="polite"><div class="empty-state"><span class="empty-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 11h22v16H5zM10 6h12M16 12v9m-4-4 4 4 4-4"/></svg></span><div><h3>O primeiro link começa tudo.</h3><p>O progresso e os vídeos prontos aparecem por aqui.</p></div><span class="empty-decoration" aria-hidden="true">↙</span></div></div></section>
+      <aside class="privacy-note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 8 10 8 10s8-5 8-10V5zM8 11l3 3 5-6"/></svg><p><strong>Seu espaço, seus arquivos.</strong> O baixador roda neste notebook, sem anúncios, rastreadores ou upload automático. Os links são enviados às próprias plataformas para buscar os vídeos.</p><button id="about-button" type="button">Como funciona <span>↗</span></button></aside>
+    </main>
+    <footer><span>milena studio <span class="footer-star">✳</span> feito para criar.</span><span>Baixe apenas vídeos que você tem permissão para salvar.</span></footer>
+  </div>
+  <dialog id="about-dialog"><div class="dialog-header"><span class="section-number">POR TRÁS DO BOTÃO</span><button id="close-dialog" type="button" aria-label="Fechar">×</button></div><h2>O caminho mais curto<br>para a sua pasta.</h2><ol><li>Você cola o link de um vídeo público.</li><li>O yt-dlp consulta a plataforma, baixa o vídeo e o FFmpeg prepara o MP4.</li><li>O arquivo fica em MilenaStudio\downloads, pronto para editar.</li></ol><p>Sem acesso às suas contas ou cookies. Vídeos privados, transmissões ao vivo, perfis, playlists e conteúdos com DRM não são suportados. Cada vídeo pode ter até duas horas e 2 GB. As plataformas podem bloquear downloads ou mudar seus formatos.</p><p>O botão “Salvar cópia” oferece o arquivo ao navegador. O original baixado já está na pasta indicada. O histórico desta página dura só enquanto o programa fica aberto.</p><p class="dialog-small">Use INICIAR_WINDOWS.cmd para abrir. ATUALIZAR_EXTRATOR.cmd atualiza o suporte às plataformas. Fechar a janela do programa encerra o baixador e interrompe downloads ativos.</p></dialog>
+</body></html>

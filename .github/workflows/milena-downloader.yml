@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# SPDX-FileCopyrightText: 2026 Jareer Abdullah
+name: Milena Downloader
+on:
+  push:
+    paths: ['integrations/milena-downloader/**', '.github/workflows/milena-downloader.yml']
+  pull_request:
+    paths: ['integrations/milena-downloader/**', '.github/workflows/milena-downloader.yml']
+permissions:
+  contents: read
+jobs:
+  downloader:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.11', '3.13']
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: integrations/milena-downloader
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m unittest discover -s tests -v
+      - run: node --check web/app.js
+      - name: Prepare Windows dependencies
+        if: runner.os == 'Windows' && matrix.python == '3.13'
+        run: |
+          python -m pip install -r requirements.txt
+          python bootstrap.py

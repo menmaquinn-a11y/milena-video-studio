@@ -1,0 +1,6 @@
+.venv/
+.runtime/
+__pycache__/
+.sites-runtime/
+.openai/
+*.mp4

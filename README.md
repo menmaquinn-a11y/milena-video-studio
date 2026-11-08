@@ -51,6 +51,9 @@ and an MCP bridge for an AI client to control the installed editor. See the
 [setup and limitations](integrations/milena-studio/README.md). The upstream editor
 is preserved; the bridge does not connect a ChatGPT conversation automatically.
 
+**Milena local downloader:** a browser interface for public YouTube and TikTok
+videos, saving MP4 on your own computer. See [Windows setup](integrations/milena-downloader/README.md).
+
 Concat is a free, open-source video editor for macOS, Windows, Linux and Android. It covers what most edits need: auto-captions, text-to-speech, background removal, keyframe animation, effects and titles, multi-track cutting, 4K export. With none of the catches: no watermark, no account, no subscription, no upload.
 
 Everything runs locally on a native Rust engine with a GPU compositor. Install it, drop in footage, cut. The AI models for captions, voices and cutout download once from Settings and work offline after that. Your footage never leaves your disk.
