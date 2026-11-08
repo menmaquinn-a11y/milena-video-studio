@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "milena-video-studio"
+version = "0.1.0"
+description = "Local MCP bridge for a Portuguese video workflow using the Concat engine"
+requires-python = ">=3.11"
+license = {text = "AGPL-3.0-or-later"}
+dependencies = ["mcp>=1.30,<2", "uvicorn>=0.30,<1"]
+
+[project.scripts]
+milena-studio = "milena_studio.server:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["milena_studio*"]
