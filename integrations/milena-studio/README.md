@@ -98,6 +98,11 @@ quando disponível na conta. Instalação e acesso do cliente precisam ser verif
 separadamente. Este repositório, sozinho, não conecta uma conversa nem dá acesso
 ao computador. Não incluímos credenciais, links públicos ou túnel já ativado.
 
+O transporte HTTP não retém sessões de clientes: reconexões do túnel não acumulam
+sessões ociosas. Os projetos abertos e a fila de edições continuam no processo do
+estúdio. Se uma instalação antiga registrar `8 sessions are already open`, atualize
+o pacote e reinicie o estúdio; os projetos já salvos permanecem no disco.
+
 ## Fluxo de exemplo
 
 1. `studio_health` para verificar a conexão.

@@ -107,9 +107,8 @@ async def run_stdio(studio):
             await server.run(*streams, server.create_initialization_options())
 
 
-async def run_http(studio, port):
-    """Loopback only. For ChatGPT web use an authenticated tunnel, not a public bind."""
-    import uvicorn
+def make_http_app(studio):
+    """Keep editor state in Studio, without retaining HTTP client sessions."""
     from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
     from mcp.server.transport_security import TransportSecuritySettings
     from starlette.applications import Starlette
@@ -118,7 +117,10 @@ async def run_http(studio, port):
 
     server = make_server(studio)
     manager = StreamableHTTPSessionManager(
-        app=server, json_response=True, max_sessions=8,
+        # Tunnel clients may reconnect without closing their previous session.
+        # Project state and edit serialization already belong to Studio; HTTP
+        # sessions only retain idle streams and eventually reject new clients.
+        app=server, json_response=True, stateless=True,
         security_settings=TransportSecuritySettings(
             enable_dns_rebinding_protection=True,
             allowed_hosts=["127.0.0.1:*", "localhost:*"],
@@ -139,9 +141,14 @@ async def run_http(studio, port):
     async def health(request):
         return JSONResponse({"service": "milena-video-studio", "version": __version__})
 
-    app = Starlette(routes=[Route("/mcp", MCP(), methods=["GET", "POST", "DELETE"]),
+    return Starlette(routes=[Route("/mcp", MCP(), methods=["GET", "POST", "DELETE"]),
                             Route("/health", health)], lifespan=lifespan)
-    await uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=port,
+
+
+async def run_http(studio, port):
+    """Loopback only. For ChatGPT web use an authenticated tunnel, not a public bind."""
+    import uvicorn
+    await uvicorn.Server(uvicorn.Config(make_http_app(studio), host="127.0.0.1", port=port,
                                       log_level="warning")).serve()
 
 

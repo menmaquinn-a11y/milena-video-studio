@@ -4,12 +4,16 @@ import base64
 import json
 import tempfile
 import unittest
+from contextlib import asynccontextmanager
 from pathlib import Path
+from unittest.mock import patch
+
+import httpx
 
 from mcp.shared.memory import create_connected_server_and_client_session
 from mcp.types import CallToolResult, ImageContent, TextContent, Tool
 
-from milena_studio.server import make_server
+from milena_studio.server import make_http_app, make_server
 from milena_studio.subtitles import parse_srt, read_srt
 from milena_studio.workflow import BackendError, Studio, Workspace, content, structured
 
@@ -160,6 +164,39 @@ class WorkflowTests(unittest.IsolatedAsyncioTestCase):
         self.editor.call_tool = recent
         result = await self.studio.forward("project_list", {})
         self.assertEqual(json.loads(result.content[0].text), [{"path": str(self.root / "ours")}])
+
+    async def test_http_reconnections_do_not_exhaust_sessions(self):
+        @asynccontextmanager
+        async def connected_editor():
+            yield
+
+        app = make_http_app(self.studio)
+        headers = {"Accept": "application/json, text/event-stream"}
+        with patch.object(self.studio, "connect", connected_editor):
+            async with app.router.lifespan_context(app):
+                async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),
+                                            base_url="http://127.0.0.1:8765",
+                                            headers=headers) as client:
+                    for i in range(12):
+                        response = await client.post("/mcp", json={
+                            "jsonrpc": "2.0", "id": i * 2,
+                            "method": "initialize", "params": {
+                                "protocolVersion": "2025-11-25", "capabilities": {},
+                                "clientInfo": {"name": "tunnel-reconnect", "version": "test"}}})
+                        self.assertEqual(response.status_code, 200, response.text)
+                        self.assertNotIn("mcp-session-id", response.headers)
+                        # Calls must also work without a retained initialize session,
+                        # while the same editor connection remains alive.
+                        response = await client.post("/mcp", json={
+                            "jsonrpc": "2.0", "id": i * 2 + 1,
+                            "method": "tools/call", "params": {
+                                "name": "studio_health", "arguments": {}}})
+                        self.assertEqual(response.status_code, 200, response.text)
+                        result = response.json()["result"]
+                        self.assertFalse(result.get("isError", False), result)
+                        self.assertEqual(json.loads(result["content"][0]["text"])["workspace"],
+                                         str(self.root))
+        self.assertEqual(sum(name == "concat_version" for name, _ in self.editor.calls), 12)
 
 
 if __name__ == "__main__":
