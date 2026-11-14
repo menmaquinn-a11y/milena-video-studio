@@ -2,4 +2,4 @@
 # SPDX-FileCopyrightText: 2026 Jareer Abdullah
 """Milena Video Studio: a local integration, built on Concat's public MCP API."""
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
