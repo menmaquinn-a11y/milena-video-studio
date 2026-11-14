@@ -147,3 +147,51 @@ de teste, adicionando legendas acentuadas, gerando uma prévia e exportando MP4
 com áudio a 320 × 180 e 30000/1001 FPS. O script de instalação do Windows precisa
 de uma verificação no computador de destino. Não foi necessário recompilar ou
 alterar o motor Rust do editor.
+
+## Vozes RVC no mesmo Concat (experimental)
+
+Esta extensão usa a ponte MCP **já existente** para expor três ferramentas:
+`studio_rvc_voices`, `studio_rvc_start` e `studio_rvc_status`. Não é uma
+segunda janela de aplicativo. Após a conversão, use `media_import` e
+`clip_add` já existentes para colocar o WAV na timeline do Concat.
+
+A geração da narração-base ainda é feita com as funções de voz do Concat
+ou com um áudio já criado; **a ponte MCP não gera TTS automaticamente nesta
+versão**. Não há aba de seleção de vozes adicionada à janela nativa do Concat.
+
+### Configuração local
+
+- Instale o motor RVC oficial e suas dependências uma vez, no mesmo computador
+  em que o Concat roda. Ele trabalha como componente local, sem precisar abrir
+  sua interface web ou outra janela.
+- Configure as variáveis de ambiente `MILENA_RVC_HOME` (pasta do RVC,
+  contendo `infer/cli.py`) e `MILENA_RVC_PYTHON` (caminho absoluto do Python
+  no ambiente RVC). Inicie/reinicie o serviço Milena Video Studio **depois**
+  de configurar essas variáveis; não altere o token ou o túnel.
+- Coloque somente modelos de confiança e autorizados em
+  `<workspace>/voices/rvc/`, por exemplo `narrador_01.pth` e, se fornecido,
+  `narrador_01.index`. Nomes aceitos: letras, números, `_` e `-`.
+- Opcionalmente use `narrador_01.json` para registrar
+  `{"display_name":"Narrador 01","commercial_use":true,"voice_owner_consent":true}`.
+  Este arquivo **registra uma declaração**, não verifica os direitos de uso.
+- Guarde o áudio-base WAV, MP3 ou FLAC dentro do `workspace`.
+
+Primeiro chame `studio_rvc_voices` para ver os modelos disponíveis e verificar
+se o motor está configurado. Em seguida use `studio_rvc_start` com `source`
+(caminho absoluto do áudio), `voice` (id do modelo), `pitch` opcional,
+`index_rate` opcional e `rights_confirmed: true` somente quando houver
+autorização para clonagem e uso pretendido. A chamada retorna um `job`;
+consulte `studio_rvc_status` até `state: done`. O resultado fica na pasta
+`<workspace>/audio/voices/`, sem substituir arquivos.
+
+Há um limite de uma conversão simultânea e de 20 minutos por job. A conversão
+é local e não depende da API da OpenAI, mas consome CPU/GPU e espaço em disco.
+A ligação com ChatGPT continua sendo a conexão MCP já existente; isso não
+embute a sessão do ChatGPT dentro da interface do Concat.
+
+**Segurança:** arquivos `.pth` podem conter dados serializados capazes de
+executar código quando carregados. Não importe modelos desconhecidos de
+Discord, sites de terceiros ou links encurtados sem verificar procedência,
+direitos e integridade. Este módulo ainda não foi testado com GPU/Windows real;
+os três comandos só aparecem quando a versão atualizada da ponte for instalada
+e a sessão MCP reiniciada.
