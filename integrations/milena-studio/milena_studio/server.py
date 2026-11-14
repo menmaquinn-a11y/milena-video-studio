@@ -15,6 +15,7 @@ from mcp.types import CallToolResult, TextContent, Tool, ToolAnnotations
 
 from . import __version__
 from .workflow import Studio, Workspace, content
+from .voice import VoiceBridge
 
 INSTRUCTIONS = (
     "Edite vídeos na pasta de trabalho configurada. Comece por studio_health e "
@@ -63,10 +64,34 @@ LOCAL_TOOLS = [
          inputSchema=schema({"path": STRING, "filename": STRING}, ["path", "filename"]),
          annotations=ToolAnnotations(readOnlyHint=False, destructiveHint=False,
                                      idempotentHint=False, openWorldHint=False)),
+
+    Tool(name="studio_rvc_voices", title="Listar vozes locais RVC",
+         description="Lista modelos RVC .pth dentro de voices/rvc da pasta de trabalho; "
+                     "não carrega modelos e informa se o motor RVC está configurado.",
+         inputSchema=schema({}, []),
+         annotations=ToolAnnotations(readOnlyHint=True, destructiveHint=False,
+                                     idempotentHint=True, openWorldHint=False)),
+    Tool(name="studio_rvc_start", title="Converter narração com voz RVC",
+         description="Inicia conversão RVC local de um WAV/FLAC/MP3 autorizado para voz .pth. "
+                     "Confirme consentimento e direitos de uso comercial; retorna job, "
+                     "não importa automaticamente áudio na timeline.",
+         inputSchema=schema({"source": STRING, "voice": STRING,
+                             "pitch": {"type": "integer", "default": 0},
+                             "index_rate": {"type": "number", "default": 0.75},
+                             "rights_confirmed": {"type": "boolean"}},
+                            ["source", "voice", "rights_confirmed"]),
+         annotations=ToolAnnotations(readOnlyHint=False, destructiveHint=False,
+                                     idempotentHint=False, openWorldHint=False)),
+    Tool(name="studio_rvc_status", title="Status da conversão RVC",
+         description="Consulta estado de job RVC, incluindo caminho do WAV quando concluído.",
+         inputSchema=schema({"job": STRING}, ["job"]),
+         annotations=ToolAnnotations(readOnlyHint=True, destructiveHint=False,
+                                     idempotentHint=True, openWorldHint=False)),
 ]
 
 
 def make_server(studio):
+    voice_bridge = VoiceBridge(studio.workspace)
     server = Server("milena-video-studio", version=__version__, instructions=INSTRUCTIONS)
 
     @server.list_tools()
@@ -89,6 +114,12 @@ def make_server(studio):
                     return await studio.import_srt(**arguments)
                 if name == "studio_export_video":
                     return await studio.export_video(**arguments)
+                if name == "studio_rvc_voices":
+                    return voice_bridge.inventory()
+                if name == "studio_rvc_start":
+                    return await voice_bridge.start(**arguments)
+                if name == "studio_rvc_status":
+                    return voice_bridge.status(**arguments)
                 if name not in {tool.name for tool in studio.tools}:
                     raise ValueError("Ferramenta não disponível no editor conectado.")
                 return await studio.forward(name, arguments)
