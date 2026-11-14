@@ -23,7 +23,9 @@ INSTRUCTIONS = (
     "Preserve o idioma, formato e duração pedidos pelo usuário. Veja timeline_read "
     "e preview_frame antes de exportar. studio_export_video inicia um job: acompanhe "
     "com export_status ou export_wait e confira o arquivo final. Salve o projeto. "
-    "A conexão não publica vídeos e não gera traduções ou vozes sozinha."
+    "A conexão não publica vídeos nem gera traduções. Para vozes RVC, consulte "
+    "studio_rvc_voices; studio_rvc_start converte áudio já existente e "
+    "studio_rvc_status acompanha o job. Não gera TTS por esta ponte."
 )
 
 
